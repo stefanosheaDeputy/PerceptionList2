@@ -32,6 +32,7 @@ struct Parent {
         case sections(IdentifiedActionOf<ChildSection>)
         case fetchObjects
         case fetchObjectsResult(Result<[Object], Error>)
+//        case closeButtonTapped
     }
     
     enum CancellableId: Hashable {
@@ -80,23 +81,33 @@ struct ParentView: View {
     
     var store: StoreOf<Parent>
     
+    @Environment(\.dismiss) var dismiss
+    
     init(store: StoreOf<Parent>) {
         self.store = store
     }
     
     var body: some View {
         WithPerceptionTracking {
-            List {
-                ForEach(
-                    store.scope(state: \.sections, action: \.sections)
-                ) { childStore in
-                    WithPerceptionTracking {
-                        ChildSectionView(store: childStore)
+            NavigationView {
+                List {
+                    ForEach(
+                        store.scope(state: \.sections, action: \.sections)
+                    ) { childStore in
+                        WithPerceptionTracking {
+                            ChildSectionView(store: childStore)
+                        }
                     }
                 }
-            }
-            .onAppear {
-                store.send(.fetchObjects)
+                .onAppear {
+                    store.send(.fetchObjects)
+                }
+                .navigationTitle("Title")
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Close", action: { dismiss() })
+                    }
+                }
             }
         }
     }
