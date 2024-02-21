@@ -10,36 +10,60 @@ import Foundation
 import SwiftUI
 
 @Reducer
-public struct ChildSection {
+struct ChildSection {
     
-    public init() {}
+    init() {}
     
     @ObservableState
-    public struct State: Identifiable {
-        public var id: UUID
+    struct State: Identifiable {
+        var id: UUID
         let title: String
         
-        public init(id: UUID = UUID(), title: String) {
+        var rows: IdentifiedArrayOf<ChildRow.State>
+        
+        init(id: UUID = UUID(), title: String, rows: IdentifiedArrayOf<ChildRow.State>) {
             self.id = id
             self.title = title
+            self.rows = rows
         }
     }
     
-    public enum Action {
-        case action
+    enum Action {
+        case rows(IdentifiedActionOf<ChildRow>)
+    }
+    
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .rows:
+                return .none
+            }
+        }
+        .forEach(\.rows, action: \.rows) {
+            ChildRow()
+        }
     }
 }
 
-public struct ChildView: View {
+struct ChildSectionView: View {
     private let store: StoreOf<ChildSection>
     
-    public init(store: StoreOf<ChildSection>) {
+    init(store: StoreOf<ChildSection>) {
         self.store = store
     }
     
-    public var body: some View {
+    var body: some View {
         WithPerceptionTracking {
-            Text(store.title)
+            Section(
+                header: Text(store.title)
+            ) {
+                ForEach(
+                    store.scope(state: \.rows, action: \.rows),
+                    id: \.state.id
+                ) { store in
+                    ChildRowView(store: store)
+                }
+            }
         }
     }
 }

@@ -86,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-perception",
       "state" : {
-        "revision" : "42240120b2a8797595433288ab4118f8042214c3",
-        "version" : "1.1.1"
+        "branch" : "fix-perception-check-ios15",
+        "revision" : "349c935ef7124b0796837292bf4fcd05029fbb9c"
       }
     },
     {
